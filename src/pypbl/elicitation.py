@@ -106,7 +106,7 @@ class BayesPreference:
     def probability(self, weights):
         return np.exp(self.log_probability(weights))
 
-    def infer_weights(self, method='MAP', iterations=100):
+    def infer_weights(self, method='MAP', iterations=500):
         """"
         Infer weights for each attribute based on preferences
 
