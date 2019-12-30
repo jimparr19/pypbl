@@ -2,7 +2,6 @@ import copy
 import itertools
 import warnings
 
-import pandas as pd
 import numpy as np
 
 from scipy.optimize import minimize
@@ -16,7 +15,7 @@ from pypbl.samplers import ensemble_sampler
 class BayesPreference:
     """
     Class for preference based learning using Bayesian inference
-    
+
     """
 
     def __init__(self, data):
@@ -128,7 +127,7 @@ class BayesPreference:
 
         print('map estimate = {}'.format(self.negative_log_probability(map_estimate)))
         print('map estimate weights {}'.format(map_estimate))
-        if method is 'MAP':
+        if method == 'MAP':
             self.weights = map_estimate
             return map_estimate
 
@@ -227,11 +226,9 @@ class BayesPreference:
 
 if __name__ == '__main__':
     import pandas as pd
-
     data = pd.read_csv('data/mtcars.csv')
     print(data)
     data.set_index('model', inplace=True)
-
     p = BayesPreference(data=data)
     # p.priors = [
     #     Exp(1),  # MPG
@@ -267,15 +264,11 @@ if __name__ == '__main__':
     p.infer_weights()
     print(p.weights)
     print(p.rank().head(5))
-
     # p.compute_entropy(['Pontiac Firebird', 'Fiat 128'])
     # p.compute_entropy(['Cadillac Fleetwood', 'Merc 450SL'])
-
     # print(p.suggest())
     # print(p.suggest_new_pair())
-
     # import matplotlib.pyplot as plt
-    #
     # for i in range(len(p.priors)):
     #     plt.hist(p.samples[:, i], 100, color="k", histtype="step")
     #     plt.show()

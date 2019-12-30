@@ -54,23 +54,3 @@ def ensemble_sampler(fun, start, sigma, iterations=500):
     print('sampler acceptance = {0:.3f}'.format(np.mean(sampler.acceptance_fraction)))
 
     return samples
-
-
-if __name__ == '__main__':
-    import matplotlib.pylab as plt
-    import seaborn as sns
-    from scipy.stats import multivariate_normal
-
-    mus = np.array([5, 5])
-    sigmas = np.array([[1, .9], [.9, 1]])
-
-
-    def pgauss(x):
-        return multivariate_normal.logpdf([x[0], x[1]], mean=mus, cov=sigmas)
-
-
-    # samples = simple_sampler(pgauss, start=[0, 0], sigma=1, iterations=1000)
-    samples = ensemble_sampler(pgauss, start=[0, 0], sigma=sigmas, iterations=5000)
-    print(samples)
-    sns.jointplot(samples[:, 0], samples[:, 1])
-    plt.show()
