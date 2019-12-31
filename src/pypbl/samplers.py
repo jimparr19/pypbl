@@ -9,6 +9,16 @@ def simple_sampler(fun, start, sigma, iterations, verbose=False):
     """
     Simple sampler based on the metropolis hastings algorithm for Markov chain Monte Carlo
 
+    Args:
+        fun (function): log probability function used to infer weights
+        start (list): initial weights (it is recommended to use the MAP estimate)
+        sigma (float): diagonal term for proposal distribution covariance
+        iterations (int): number of iterations in sampling algorithm
+        verbose (boolean): set as True to get verbose print out
+
+    Returns:
+        Numpy array of samples
+
     """
     mean = np.zeros(len(start))
     cov = np.eye(len(start)) * sigma
@@ -40,6 +50,16 @@ def simple_sampler(fun, start, sigma, iterations, verbose=False):
 def ensemble_sampler(fun, start, sigma, iterations, verbose=False):
     """
     Sampler based on the affine-invariant ensemble sampler for Markov chain Monte Carlo
+
+    Args:
+        fun (function): log probability function used to infer weights.
+        start (list): initial weights (it is recommended to use the MAP estimate).
+        sigma (float): term used to encourage different starting conditions for walkers.
+        iterations (int): number of iterations in sampling algorithm (total number of evaluation will be  2 * number of weights * iterations).
+        verbose (boolean): set as True to get verbose print out.
+
+    Returns:
+        Numpy array of samples
 
     """
     n_dim = len(start)
