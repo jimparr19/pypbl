@@ -12,21 +12,23 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
+import os
+import sys
+sys.path.insert(0, os.path.abspath('../../src/pypbl'))
 
 
 # -- Project information -----------------------------------------------------
+
+from pypbl import __version__
 
 project = 'pypbl'
 copyright = '2019, Jim Parr'
 author = 'Jim Parr'
 
 # The short X.Y version
-version = ''
+version = __version__
 # The full version, including alpha/beta/rc tags
-release = '0.0.1'
+release = __version__
 
 
 # -- General configuration ---------------------------------------------------
