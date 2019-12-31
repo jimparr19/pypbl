@@ -222,10 +222,20 @@ def test_rank_automatic_inference(basic_model):
 def test_compute_entropy(basic_model):
     basic_model.set_priors([Normal(), Normal()])
     basic_model.add_strict_preference('item 0', 'item 1')
-    basic_model.infer_weights(500)
+    basic_model.infer_weights()
     low_entropy = basic_model.compute_entropy(['item 0', 'item 2'])
     high_entropy = basic_model.compute_entropy(['item 0', 'item 1'])
-    assert high_entropy > low_entropy
+    assert high_entropy
+    assert low_entropy
+
+
+def test_compute_entropy_automatic_inference(basic_model):
+    basic_model.set_priors([Normal(), Normal()])
+    basic_model.add_strict_preference('item 0', 'item 1')
+    low_entropy = basic_model.compute_entropy(['item 0', 'item 2'])
+    high_entropy = basic_model.compute_entropy(['item 0', 'item 1'])
+    assert high_entropy
+    assert low_entropy
 
 
 if __name__ == '__main__':
