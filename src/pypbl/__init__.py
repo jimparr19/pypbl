@@ -1,2 +1,2 @@
-from dunamai import Version
-__version__ = Version.from_git().serialize()
+import dunamai as _dunamai
+__version__ = _dunamai.get_version('pypbl').serialize()
