@@ -1,7 +1,7 @@
 name: release
 
 on:
-  create:
+  push:
     tags:
       - 'v*'
 
@@ -12,10 +12,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    - name: Set up Python ${{ matrix.python-version }}
+    - name: Set up Python 3.7
       uses: actions/setup-python@v1
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: 3.7
     - uses: dschep/install-poetry-action@v1.2
     - name: Install dependencies
       run: poetry install
