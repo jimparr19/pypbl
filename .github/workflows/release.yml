@@ -7,6 +7,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - uses: actions/checkout@v1
     - uses: ./.github/workflows/pythonpackage
     - name: Publish package
       run: poetry publish --username {{ secrets.pypi_username }} --password {{ secrets.pypi_password }}
