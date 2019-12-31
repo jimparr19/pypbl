@@ -107,7 +107,7 @@ class BayesPreference:
     def probability(self, weights):
         return np.exp(self.log_probability(weights))
 
-    def infer_weights(self, method='MAP', iterations=500):
+    def infer_weights(self, method='MAP', iterations=100):
         """"
         Infer weights for each attribute based on preferences
 
@@ -115,8 +115,9 @@ class BayesPreference:
         if self.priors is None:
             raise AttributeError('No priors have been specified.')
 
-        if any([isinstance(prior, Exponential) for prior in self.priors]):
-            warnings.warn("It is recommended to use method='mean' when using exponential priors.")
+        if method == 'MAP':
+            if any([isinstance(prior, Exponential) for prior in self.priors]):
+                warnings.warn("It is recommended to use method='mean' when using exponential priors.")
 
         self.lb = [0 if prior(-1) == -np.inf else -np.inf for prior in self.priors]
         self.ub = [0 if prior(1) == -np.inf else np.inf for prior in self.priors]
@@ -127,8 +128,6 @@ class BayesPreference:
         results = minimize(self.negative_log_probability, x0=x0, bounds=bounds)
         map_estimate = results['x']
 
-        print('map estimate = {}'.format(self.negative_log_probability(map_estimate)))
-        print('map estimate weights {}'.format(map_estimate))
         if method == 'MAP':
             self.weights = map_estimate
             return map_estimate
@@ -137,8 +136,6 @@ class BayesPreference:
                                         iterations=iterations)
 
         mean_estimate = np.mean(self.samples, axis=0)
-        print('mean estimate = {}'.format(self.negative_log_probability(mean_estimate)))
-        print('mean estimate weights {}'.format(mean_estimate))
 
         self.weights = mean_estimate
         return mean_estimate
@@ -190,7 +187,6 @@ class BayesPreference:
             b_entropy += b_density.dot(np.log(b_density))
 
         ab_entropy = -(ab_prob * a_entropy + (1 - ab_prob) * b_entropy)
-        print('entropy for {} and {} is {}'.format(x[0], x[1], ab_entropy))
         return ab_entropy
 
     def suggest_new_pair(self):
@@ -202,7 +198,12 @@ class BayesPreference:
         existing_combinations = [tuple(sorted(p)) for p in self.strict_preferences] + \
                                 [tuple(sorted(p)) for p in self.indifferent_preferences]
         new_combinations = list(set(possible_combinations) - set(existing_combinations))
-        entropy = [self.compute_entropy(x) for x in new_combinations]
+
+        entropy = []
+        for i, x in enumerate(new_combinations):
+            print('Computing entropy for {} of {} combinations'.format(i, len(new_combinations)))
+            entropy.append(self.compute_entropy(x))
+
         index = np.argmin(entropy)
         return new_combinations[int(index)]
 
@@ -222,57 +223,11 @@ class BayesPreference:
                 All pairs that include the highest ranked item have been suggested, suggesting a fresh new pair instead.
                 ''')
             return self.suggest_new_pair()
-        entropy = [self.compute_entropy(x) for x in new_combinations]
+
+        entropy = []
+        for i, x in enumerate(new_combinations):
+            print('Computing entropy for {} of {} combinations'.format(i, len(new_combinations)))
+            entropy.append(self.compute_entropy(x))
         index = np.argmin(entropy)
+
         return new_combinations[int(index)]
-
-
-if __name__ == '__main__':
-    import pandas as pd
-
-    data = pd.read_csv('data/mtcars.csv')
-    print(data)
-    data.set_index('model', inplace=True)
-    p = BayesPreference(data=data)
-    # p.priors = [
-    #     Exponential(1),  # MPG
-    #     Normal(),  # Number of cylinders (Normal() = Normal(0, 1))
-    #     Normal(),  # displacement
-    #     Exponential(2),  # horsepower
-    #     Normal(),  # real axle ratio
-    #     Normal(),  # weight
-    #     Exponential(-3),  # quarter mile time
-    #     Normal(),  # Engine type
-    #     Normal(),  # transmission type
-    #     Normal(),  # number of gears
-    #     Normal()  # number of carburetors
-    # ]
-    p.priors = [
-        Normal(),  # MPG
-        Normal(),  # Number of cylinders (Normal() = Normal(0, 1))
-        Normal(),  # displacement
-        Normal(),  # horsepower
-        Normal(),  # real axle ratio
-        Normal(),  # weight
-        Normal(),  # quarter mile time
-        Normal(),  # Engine type
-        Normal(),  # transmission type
-        Normal(),  # number of gears
-        Normal()  # number of carburetors
-    ]
-    p.add_strict_preference('Pontiac Firebird', 'Fiat 128')
-    p.add_strict_preference('Mazda RX4', 'Mazda RX4 Wag')
-    p.add_indifferent_preference('Merc 280', 'Merc 280C')
-    # p.add_strict_preference('Mazda RX4', 'Cadillac Fleetwood')
-    # p.add_strict_preference('Chrysler Imperial', 'Mazda RX4')
-    p.infer_weights()
-    print(p.weights)
-    print(p.rank().head(5))
-    # p.compute_entropy(['Pontiac Firebird', 'Fiat 128'])
-    # p.compute_entropy(['Cadillac Fleetwood', 'Merc 450SL'])
-    # print(p.suggest())
-    # print(p.suggest_new_pair())
-    # import matplotlib.pyplot as plt
-    # for i in range(len(p.priors)):
-    #     plt.hist(p.samples[:, i], 100, color="k", histtype="step")
-    #     plt.show()

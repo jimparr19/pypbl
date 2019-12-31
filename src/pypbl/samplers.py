@@ -5,7 +5,7 @@ import numpy as np
 from multiprocessing import Pool
 
 
-def simple_sampler(fun, start, sigma=1, iterations=1000):
+def simple_sampler(fun, start, sigma, iterations, verbose=False):
     """
     Simple sampler based on the metropolis hastings algorithm for Markov chain Monte Carlo
 
@@ -31,12 +31,13 @@ def simple_sampler(fun, start, sigma=1, iterations=1000):
             acceptance += 1
         samples[i] = np.array(previous)
 
-    print('sampler acceptance = {0:.3f}'.format(acceptance / iterations))
+    if verbose:
+        print('sampler acceptance = {0:.3f}'.format(acceptance / iterations))
 
     return samples
 
 
-def ensemble_sampler(fun, start, sigma, iterations=500):
+def ensemble_sampler(fun, start, sigma, iterations, verbose=False):
     """
     Sampler based on the affine-invariant ensemble sampler for Markov chain Monte Carlo
 
@@ -51,6 +52,7 @@ def ensemble_sampler(fun, start, sigma, iterations=500):
 
     samples = sampler.get_chain(flat=True)
 
-    print('sampler acceptance = {0:.3f}'.format(np.mean(sampler.acceptance_fraction)))
+    if verbose:
+        print('sampler acceptance = {0:.3f}'.format(np.mean(sampler.acceptance_fraction)))
 
     return samples
