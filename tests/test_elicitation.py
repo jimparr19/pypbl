@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 
 from pypbl.elicitation import BayesPreference
-from pypbl.priors import Normal, Exp
+from pypbl.priors import Normal, Exponential
 
 
 @pytest.fixture
@@ -28,9 +28,9 @@ def test_incorrect_set_priors(basic_model):
 
 
 def test_set_strict_preference(basic_model):
-    assert len(basic_model.strict) == 0
+    assert len(basic_model.strict_preferences) == 0
     basic_model.add_strict_preference('item 0', 'item 1')
-    assert len(basic_model.strict) == 1
+    assert len(basic_model.strict_preferences) == 1
 
 
 def test_set_strict_preference_invalid_items(basic_model):
@@ -39,9 +39,9 @@ def test_set_strict_preference_invalid_items(basic_model):
 
 
 def test_set_indifferent_preference(basic_model):
-    assert len(basic_model.indifferent) == 0
+    assert len(basic_model.indifferent_preferences) == 0
     basic_model.add_indifferent_preference('item 0', 'item 1')
-    assert len(basic_model.indifferent) == 1
+    assert len(basic_model.indifferent_preferences) == 1
 
 
 def test_set_invalid_preference_invalid_items(basic_model):
@@ -50,40 +50,40 @@ def test_set_invalid_preference_invalid_items(basic_model):
 
 
 def test_remove_last_strict_preference(basic_model):
-    assert len(basic_model.strict) == 0
+    assert len(basic_model.strict_preferences) == 0
     basic_model.add_strict_preference('item 0', 'item 1')
-    assert len(basic_model.strict) == 1
+    assert len(basic_model.strict_preferences) == 1
     basic_model.remove_last_strict_preference()
-    assert len(basic_model.strict) == 0
+    assert len(basic_model.strict_preferences) == 0
 
 
 def test_strict_log_probability(basic_model):
-    basic_model.set_priors([Normal(1, 0.5), Exp(0.5)])
+    basic_model.set_priors([Normal(1, 0.5), Exponential(0.5)])
     x = np.array([1.0, 0.5])
     assert basic_model.strict_log_probability(('item 0', 'item 1'), x) == pytest.approx(-0.1413058, 0.001)
     assert basic_model.strict_log_probability(('item 1', 'item 0'), x) == pytest.approx(-2.026650, 0.001)
 
 
 def test_indifferent_log_probability(basic_model):
-    basic_model.set_priors([Normal(1, 0.5), Exp(0.5)])
+    basic_model.set_priors([Normal(1, 0.5), Exponential(0.5)])
     x = np.array([1.0, 0.5])
     assert basic_model.indifferent_log_probability(('item 0', 'item 1'), x) == pytest.approx(-0.7188213, 0.001)
 
 
 def test_log_probability(basic_model):
-    basic_model.set_priors([Normal(1, 0.5), Exp(0.5)])
+    basic_model.set_priors([Normal(1, 0.5), Exponential(0.5)])
     x = np.array([1.0, 0.5])
     assert basic_model.log_probability(x) == basic_model.priors[0](x[0]) + basic_model.priors[1](x[1])
 
 
 def test_negative_log_probability(basic_model):
-    basic_model.set_priors([Normal(1, 0.5), Exp(0.5)])
+    basic_model.set_priors([Normal(1, 0.5), Exponential(0.5)])
     x = np.array([1.0, 0.5])
     assert basic_model.negative_log_probability(x) == - basic_model.log_probability(x)
 
 
 def test_probability(basic_model):
-    basic_model.set_priors([Normal(1, 0.5), Exp(0.5)])
+    basic_model.set_priors([Normal(1, 0.5), Exponential(0.5)])
     x = np.array([1.0, 0.5])
     assert basic_model.probability(x) == np.exp(basic_model.log_probability(x))
 
@@ -110,7 +110,7 @@ def test_inference_with_normal_priors_parsing_mean_method(basic_model):
 
 
 def test_inference_with_different_priors(basic_model):
-    basic_model.set_priors([Normal(1, 1), Exp(-0.5)])
+    basic_model.set_priors([Normal(1, 1), Exponential(-0.5)])
     assert basic_model.weights is None
     with pytest.warns(UserWarning):
         basic_model.infer_weights()
@@ -223,7 +223,7 @@ def test_compute_entropy(basic_model):
     basic_model.set_priors([Normal(), Normal()])
     basic_model.add_strict_preference('item 0', 'item 1')
     basic_model.infer_weights()
-    low_entropy = basic_model.compute_entropy(['item 1', 'item 2'])
+    low_entropy = basic_model.compute_entropy(['item 0', 'item 2'])
     high_entropy = basic_model.compute_entropy(['item 0', 'item 1'])
     assert high_entropy > low_entropy
 
@@ -231,7 +231,7 @@ def test_compute_entropy(basic_model):
 def test_compute_entropy_automatic_inference(basic_model):
     basic_model.set_priors([Normal(), Normal()])
     basic_model.add_strict_preference('item 0', 'item 1')
-    low_entropy = basic_model.compute_entropy(['item 1', 'item 2'])
+    low_entropy = basic_model.compute_entropy(['item 0', 'item 2'])
     high_entropy = basic_model.compute_entropy(['item 0', 'item 1'])
     assert high_entropy > low_entropy
 

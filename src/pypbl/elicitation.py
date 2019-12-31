@@ -3,12 +3,13 @@ import itertools
 import warnings
 
 import numpy as np
+import pandas as pd
 
 from scipy.optimize import minimize
 from scipy.stats import norm
 from scipy.stats import gaussian_kde
 
-from pypbl.priors import Normal, Exp
+from pypbl.priors import Normal, Exponential
 from pypbl.samplers import ensemble_sampler
 
 
@@ -23,8 +24,8 @@ class BayesPreference:
         self.items = self.data.index.values
         self.sigma = 0.1
         self.Sigma = self.sigma * np.eye(len(self.data.columns))
-        self.strict = []
-        self.indifferent = []
+        self.strict_preferences = []
+        self.indifferent_preferences = []
         self.priors = None
         self.weights = None
         self.samples = None
@@ -46,14 +47,14 @@ class BayesPreference:
         if b not in self.items:
             raise ValueError('Parameter {} not a valid item'.format(b))
 
-        self.strict.append([a, b])
+        self.strict_preferences.append([a, b])
 
     def remove_last_strict_preference(self):
         """"
         Removed the most recently added strict preference
 
         """
-        del self.strict[-1]
+        del self.strict_preferences[-1]
 
     def add_indifferent_preference(self, a, b):
         """"
@@ -65,7 +66,7 @@ class BayesPreference:
         if b not in self.items:
             raise ValueError('Parameter {} not a valid item'.format(b))
 
-        self.indifferent.append([a, b])
+        self.indifferent_preferences.append([a, b])
 
     def strict_log_probability(self, preference, weights):
         """"
@@ -93,9 +94,10 @@ class BayesPreference:
         Computes the log posterior probability based on the sum of each strict and indifferent preference probability
 
         """
-        strict_log_probability = sum([self.strict_log_probability(preference, weights) for preference in self.strict])
+        strict_log_probability = sum(
+            [self.strict_log_probability(preference, weights) for preference in self.strict_preferences])
         indifferent_log_probability = sum(
-            [self.indifferent_log_probability(preference, weights) for preference in self.indifferent])
+            [self.indifferent_log_probability(preference, weights) for preference in self.indifferent_preferences])
         log_prior = sum([self.priors[i](weight) for i, weight in enumerate(weights)])
         return strict_log_probability + indifferent_log_probability + log_prior
 
@@ -113,7 +115,7 @@ class BayesPreference:
         if self.priors is None:
             raise AttributeError('No priors have been specified.')
 
-        if any([isinstance(prior, Exp) for prior in self.priors]):
+        if any([isinstance(prior, Exponential) for prior in self.priors]):
             warnings.warn("It is recommended to use method='mean' when using exponential priors.")
 
         self.lb = [0 if prior(-1) == -np.inf else -np.inf for prior in self.priors]
@@ -150,8 +152,8 @@ class BayesPreference:
             self.infer_weights()
 
         utilities = [self.weights.dot(row.values) for i, row in self.data.iterrows()]
-        return pd.DataFrame(utilities, index=self.data.index.values, columns=['utility']).sort_values(by='utility',
-                                                                                                      ascending=False)
+        rank_df = pd.DataFrame(utilities, index=self.data.index.values, columns=['utility'])
+        return rank_df.sort_values(by='utility', ascending=False)
 
     def compute_entropy(self, x):
         """"
@@ -197,7 +199,8 @@ class BayesPreference:
 
         """
         possible_combinations = [tuple(sorted(p)) for p in itertools.combinations(self.data.index, 2)]
-        existing_combinations = [tuple(sorted(p)) for p in self.strict] + [tuple(sorted(p)) for p in self.indifferent]
+        existing_combinations = [tuple(sorted(p)) for p in self.strict_preferences] + \
+                                [tuple(sorted(p)) for p in self.indifferent_preferences]
         new_combinations = list(set(possible_combinations) - set(existing_combinations))
         entropy = [self.compute_entropy(x) for x in new_combinations]
         index = np.argmin(entropy)
@@ -210,8 +213,8 @@ class BayesPreference:
         """
         best = self.rank().index.values[0]
         possible_combinations = [tuple(sorted(p)) for p in itertools.combinations(self.data.index, 2) if best in p]
-        existing_combinations = [tuple(sorted(p)) for p in self.strict if best in p] + [tuple(sorted(p)) for p in
-                                                                                        self.indifferent if best in p]
+        existing_combinations = [tuple(sorted(p)) for p in self.strict_preferences if best in p] + \
+                                [tuple(sorted(p)) for p in self.indifferent_preferences if best in p]
         new_combinations = list(set(possible_combinations) - set(existing_combinations))
         if len(new_combinations) == 0:
             warnings.warn(
@@ -226,18 +229,19 @@ class BayesPreference:
 
 if __name__ == '__main__':
     import pandas as pd
+
     data = pd.read_csv('data/mtcars.csv')
     print(data)
     data.set_index('model', inplace=True)
     p = BayesPreference(data=data)
     # p.priors = [
-    #     Exp(1),  # MPG
+    #     Exponential(1),  # MPG
     #     Normal(),  # Number of cylinders (Normal() = Normal(0, 1))
     #     Normal(),  # displacement
-    #     Exp(2),  # horsepower
+    #     Exponential(2),  # horsepower
     #     Normal(),  # real axle ratio
     #     Normal(),  # weight
-    #     Exp(-3),  # quarter mile time
+    #     Exponential(-3),  # quarter mile time
     #     Normal(),  # Engine type
     #     Normal(),  # transmission type
     #     Normal(),  # number of gears
