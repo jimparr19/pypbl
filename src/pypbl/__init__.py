@@ -1,1 +1,2 @@
-__version__ = '0.1.0'
+import dunamai as _dunamai
+__version__ = _dunamai.get_version('pypbl').serialize()

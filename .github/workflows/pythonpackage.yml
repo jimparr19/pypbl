@@ -1,26 +1,12 @@
-name: pythonpackage
+name: release
 
 on: [push]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-    strategy:
-      max-parallel: 2
-      matrix:
-        python-version: [3.7, 3.8]
 
     steps:
-    - uses: actions/checkout@v1
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v1
-      with:
-        python-version: ${{ matrix.python-version }}
-    - uses: dschep/install-poetry-action@v1.2
-    - name: Install dependencies
-      run: poetry install
-    - name: Lint with flake8
-      run: poetry run flake8 src/ --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Test with pytest
-      run: poetry run pytest --cov=src --cov-branch --cov-fail-under=90 tests/
+    - uses: ./.github/workflows/pythonpackage
+    - name: Publish package
+      run: poetry publish --username {{ secrets.pypi_username }} --password {{ secrets.pypi_password }}

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pypbl"
-version = "0.1.0"
+version = "0.0.0"
 description = ""
 authors = ["jimparr <jim.parr@mclaren.com>"]
 
@@ -10,6 +10,7 @@ numpy = "^1.18.0"
 scipy = "^1.4.1"
 emcee = "^3.0.2"
 pandas = "^0.25.3"
+dunamai = "^1.0.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
