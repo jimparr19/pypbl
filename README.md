@@ -1,5 +1,7 @@
 # pypbl
 
+[![Actions Status](https://github.com/jimparr19/pypbl/workflows/pythonpackage/badge.svg)](https://github.com/jimparr19/pypbl/actions)
+
 A python library for preference based learning using pairwise comparisons.
 
 We want to recommend a personalised list of items to an individual. 
