@@ -29,4 +29,4 @@ jobs:
        poetry version $(dunamai from git)
        poetry build
     - name: Publish package
-      run: poetry publish --username {{ secrets.pypi_username }} --password {{ secrets.pypi_password }}
+      run: poetry publish -u {{ secrets.pypi_username }} -p {{ secrets.pypi_password }}
