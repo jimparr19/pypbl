@@ -43,6 +43,14 @@ toml = ["toml"]
 
 [[package]]
 category = "main"
+description = "Dynamic version generation"
+name = "dunamai"
+optional = false
+python-versions = ">=3.5,<4.0"
+version = "1.0.0"
+
+[[package]]
+category = "main"
 description = "The Python ensemble sampling toolkit for MCMC"
 name = "emcee"
 optional = false
@@ -293,7 +301,7 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["pathlib2", "contextlib2", "unittest2"]
 
 [metadata]
-content-hash = "0d074bff21728197c2a005617484ec1a1a0a8a9498bb2f108403fd6f81872eb6"
+content-hash = "fdf852ba9273935781acaf47858b381bcdb44095413ee7f0cfed059cae511d42"
 python-versions = "^3.7"
 
 [metadata.files]
@@ -341,6 +349,10 @@ coverage = [
     {file = "coverage-5.0.1-cp39-cp39m-win32.whl", hash = "sha256:2714160a63da18aed9340c70ed514973971ee7e665e6b336917ff4cca81a25b1"},
     {file = "coverage-5.0.1-cp39-cp39m-win_amd64.whl", hash = "sha256:b7dbc5e8c39ea3ad3db22715f1b5401cd698a621218680c6daf42c2f9d36e205"},
     {file = "coverage-5.0.1.tar.gz", hash = "sha256:5ac71bba1e07eab403b082c4428f868c1c9e26a21041436b4905c4c3d4e49b08"},
+]
+dunamai = [
+    {file = "dunamai-1.0.0-py3-none-any.whl", hash = "sha256:18e77ec3e68912cf396245b88377efddff60dd95d0cbe1700e06b42aaf9f6d6e"},
+    {file = "dunamai-1.0.0.tar.gz", hash = "sha256:82f099585b9477a85250fff660a20f6d8c7d2f78de7ecbcebb7df85389433bf8"},
 ]
 emcee = [
     {file = "emcee-3.0.2-py2.py3-none-any.whl", hash = "sha256:bffaa2e1830d90f4e2ae42ca8db9bef67b73eefe90bdedacf58c9a1977966184"},
