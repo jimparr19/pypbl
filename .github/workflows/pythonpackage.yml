@@ -31,5 +31,6 @@ jobs:
       run: poetry run pytest --cov=src --cov-branch --cov-fail-under=90 tests/
     - name: Build package
       run: |
+       pip install dunamai
        poetry version $(dunamai from git)
        poetry build
