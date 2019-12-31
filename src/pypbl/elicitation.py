@@ -20,6 +20,10 @@ class BayesPreference:
     """
 
     def __init__(self, data):
+        """
+        Args:
+            data (object): Pandas DataFrame with columns as features and index as item names
+        """
         self.data = data
         self.items = self.data.index.values
         self.sigma = 0.1
@@ -33,13 +37,29 @@ class BayesPreference:
         self.ub = None
 
     def set_priors(self, priors):
+        """
+        Set priors
+
+        Args:
+            priors (list): List of priors
+
+        Raises:
+            AttributeError
+        """
         if len(priors) != len(self.data.columns):
             raise AttributeError('The number of priors should match the number of parameters')
         self.priors = priors
 
     def add_strict_preference(self, a, b):
-        """"
+        """
         Adds a preference based on a > b
+
+        Args:
+            a (str): name of item a that is preferred over item b
+            b (str): name of item b
+
+        Raises:
+            ValueError
 
         """
         if a not in self.items:
@@ -50,15 +70,22 @@ class BayesPreference:
         self.strict_preferences.append([a, b])
 
     def remove_last_strict_preference(self):
-        """"
+        """
         Removed the most recently added strict preference
 
         """
         del self.strict_preferences[-1]
 
     def add_indifferent_preference(self, a, b):
-        """"
+        """
         Adds a preference based on a == b
+
+        Args:
+            a (str): name of item a that has equal preference to item b
+            b (str): name of item b
+
+        Raises:
+            ValueError
 
         """
         if a not in self.items:
@@ -69,8 +96,15 @@ class BayesPreference:
         self.indifferent_preferences.append([a, b])
 
     def strict_log_probability(self, preference, weights):
-        """"
+        """
         Computes the log probability for a strict preference
+
+        Args:
+            preference (tuple): strict preference relationship (a > b)
+            weights (Numpy Array): weights for each feature
+
+        Returns:
+            Log probability of strict preference given weights
 
         """
         delta = self.data.loc[preference[0], :].values - self.data.loc[preference[1], :].values
@@ -79,8 +113,15 @@ class BayesPreference:
         return norm.logcdf(mean, loc=0, scale=np.sqrt(variance))
 
     def indifferent_log_probability(self, preference, weights):
-        """"
+        """
         Computes the log probability for an indifferent preference
+
+        Args:
+            preference (tuple): indifference preference relationship (a == b)
+            weights (Numpy Array): weights for each feature
+
+        Returns:
+            Log probability of indifferent preference given weights
 
         """
         delta = self.data.loc[preference[0], :].values - self.data.loc[preference[1], :].values
@@ -90,8 +131,14 @@ class BayesPreference:
         return np.log(norm.cdf(mean + 0.5, loc=0, scale=sd) - norm.cdf(mean - 0.5, loc=0, scale=sd))
 
     def log_probability(self, weights):
-        """"
+        """
         Computes the log posterior probability based on the sum of each strict and indifferent preference probability
+
+        Args:
+            weights (Numpy Array): weights for each feature
+
+        Returns:
+            Log posterior probability given preference data and weights
 
         """
         strict_log_probability = sum(
@@ -108,8 +155,20 @@ class BayesPreference:
         return np.exp(self.log_probability(weights))
 
     def infer_weights(self, method='MAP', iterations=100):
-        """"
-        Infer weights for each attribute based on preferences
+        """
+        Infer weights for each attribute based on preferences.
+        method='MAP' uses gradient based optimisation to compute the maximum a posteriori
+        method='mean' uses sampling to compute a better estimate of the weights when using non-normal priors
+
+        Args:
+            method (str): method used for inference
+            iterations (int): number of iterations to use when method='mean'
+
+        Returns:
+            Estimated weights using Bayesian inference
+
+        Raises:
+            AttributeError
 
         """
         if self.priors is None:
@@ -141,8 +200,11 @@ class BayesPreference:
         return mean_estimate
 
     def rank(self):
-        """"
+        """
         Rank items based on the inferred weights
+
+        Returns:
+            Pandas DataFrame of ordered items and utility values
 
         """
         if self.weights is None:
@@ -153,8 +215,14 @@ class BayesPreference:
         return rank_df.sort_values(by='utility', ascending=False)
 
     def compute_entropy(self, x):
-        """"
+        """
         Compute entropy of a new preference
+
+        Args:
+            x (list): pair of items
+
+        Returns:
+            Entropy for the pair of items
 
         """
         if self.samples is None:
@@ -190,8 +258,11 @@ class BayesPreference:
         return ab_entropy
 
     def suggest_new_pair(self):
-        """"
+        """
         Suggest a new pair of items with minimum entropy
+
+        Returns:
+            Pair of items that minimises expected entropy
 
         """
         possible_combinations = [tuple(sorted(p)) for p in itertools.combinations(self.data.index, 2)]
@@ -208,8 +279,11 @@ class BayesPreference:
         return new_combinations[int(index)]
 
     def suggest(self):
-        """"
+        """
         Suggest a new item to compare with the most preferred item
+
+        Returns:
+            Pair of items that include the top ranked item and minimises expected entropy
 
         """
         best = self.rank().index.values[0]
