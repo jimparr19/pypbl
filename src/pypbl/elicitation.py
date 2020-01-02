@@ -169,8 +169,13 @@ class BayesPreference:
 
         Raises:
             AttributeError
+            ValueError
 
         """
+        available_methods = ['MAP', 'mean']
+        if method not in available_methods:
+            raise ValueError("'method' most be one of the available methods {}".format(available_methods))
+
         if self.priors is None:
             raise AttributeError('No priors have been specified.')
 
@@ -259,11 +264,23 @@ class BayesPreference:
     def suggest_new_pair(self, method='random'):
         """
         Suggest a new pair of items with minimum entropy
+        method='random' chooses a new pair at random
+        method='min_entropy' chooses a new pair that minimises expected entropy
+
+        Args:
+            method (str): suggestion method one of 'random' or 'min_entropy'
 
         Returns:
-            Pair of items that minimises expected entropy
+            Pair of items that based on the selected method
+
+        Raises:
+            ValueError
 
         """
+        available_methods = ['random', 'min_entropy']
+        if method not in available_methods:
+            raise ValueError("'method' most be one of the available methods {}".format(available_methods))
+
         possible_combinations = [tuple(sorted(p)) for p in itertools.combinations(self.data.index, 2)]
         existing_combinations = [tuple(sorted(p)) for p in self.strict_preferences] + \
                                 [tuple(sorted(p)) for p in self.indifferent_preferences]
@@ -285,11 +302,24 @@ class BayesPreference:
     def suggest(self, method='random'):
         """
         Suggest a new item to compare with the most preferred item
+        method='random' chooses a new pair that includes the top ranked item at random
+        method='max_variance' chooses a pair that includes the top ranked item and the item with greatest uncertainty
+        method='min_entropy' chooses a pair that includes the top ranked item and minimises expected entropy
+
+        Args:
+            method (str): suggestion method one of 'random', 'max_variance' or 'min_entropy'
 
         Returns:
-            Pair of items that include the top ranked item and minimises expected entropy
+            Pair of items that includes the top ranked item and another item based on the selected method
+
+        Raises:
+            ValueError
 
         """
+        available_methods = ['random', 'min_entropy', 'max_variance']
+        if method not in available_methods:
+            raise ValueError("'method' most be one of the available methods {}".format(available_methods))
+
         best = self.rank().index.values[0]
         possible_combinations = [tuple(sorted(p)) for p in itertools.combinations(self.data.index, 2) if best in p]
         existing_combinations = [tuple(sorted(p)) for p in self.strict_preferences if best in p] + \
@@ -305,7 +335,7 @@ class BayesPreference:
         if method == 'random':
             index = np.random.choice(range(len(new_combinations)))
             suggestion = new_combinations[int(index)]
-        elif method == 'max_uncertainty':
+        elif method == 'max_variance':
             self.infer_weights(method='mean')
             utility_std = []
             for items in new_combinations:
@@ -314,7 +344,6 @@ class BayesPreference:
                 utility_std.append(np.std([sample.dot(item_values) for sample in self.samples]))
             index = np.argmax(utility_std)
             suggestion = new_combinations[int(index)]
-
         elif method == 'min_entropy':
             entropy = []
             for i, x in enumerate(new_combinations):
@@ -322,5 +351,4 @@ class BayesPreference:
                 entropy.append(self.compute_entropy(x))
             index = np.argmin(entropy)
             suggestion = new_combinations[int(index)]
-
         return suggestion
