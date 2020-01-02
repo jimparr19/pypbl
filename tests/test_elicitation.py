@@ -88,6 +88,13 @@ def test_probability(basic_model):
     assert basic_model.probability(x) == np.exp(basic_model.log_probability(x))
 
 
+def test_inference_raises_error(basic_model):
+    basic_model.set_priors([Normal(), Normal()])
+    basic_model.add_strict_preference('item 0', 'item 1')
+    with pytest.raises(ValueError):
+        basic_model.infer_weights(method='test')
+
+
 def test_inference_with_normal_priors(basic_model):
     basic_model.set_priors([Normal(1, 0.5), Normal(2, 0.5)])
     assert basic_model.weights is None
@@ -167,6 +174,7 @@ def test_inference_with_strict_and_indifferent_preferences_with_mean_method(basi
     basic_model.infer_weights(method='mean')
     assert basic_model.weights[0] > basic_model.weights[1]
 
+
 def test_suggest_new_pair_random_method(basic_model):
     basic_model.set_priors([Normal(), Normal()])
     basic_model.add_strict_preference('item 0', 'item 2')
@@ -203,6 +211,14 @@ def test_suggest_entropy_method(basic_model):
     assert 'item 0' in pair
 
 
+def test_suggest_variance_method(basic_model):
+    basic_model.set_priors([Normal(), Normal()])
+    basic_model.add_strict_preference('item 0', 'item 1')
+    basic_model.infer_weights()
+    pair = basic_model.suggest(method='max_variance')
+    assert 'item 0' in pair
+
+
 def test_suggest_all_suggested_pairs(basic_model):
     basic_model.set_priors([Normal(), Normal()])
     basic_model.add_strict_preference('item 0', 'item 1')
@@ -211,6 +227,16 @@ def test_suggest_all_suggested_pairs(basic_model):
     with pytest.warns(UserWarning):
         pair = basic_model.suggest()
     assert 'item 0' not in pair
+
+
+def test_suggest_raises_error(basic_model):
+    basic_model.set_priors([Normal(), Normal()])
+    basic_model.add_strict_preference('item 0', 'item 1')
+    basic_model.add_strict_preference('item 0', 'item 2')
+    with pytest.raises(ValueError):
+        basic_model.suggest(method='test')
+    with pytest.raises(ValueError):
+        basic_model.suggest_new_pair(method='test')
 
 
 def test_rank(basic_model):
