@@ -225,8 +225,7 @@ class BayesPreference:
             Entropy for the pair of items
 
         """
-        if self.samples is None:
-            self.infer_weights(method='mean')
+        self.infer_weights(method='mean')
 
         p_new = copy.deepcopy(self)
         p_new.add_strict_preference(x[0], x[1])
@@ -257,7 +256,7 @@ class BayesPreference:
         ab_entropy = -(ab_prob * a_entropy + (1 - ab_prob) * b_entropy)
         return ab_entropy
 
-    def suggest_new_pair(self):
+    def suggest_new_pair(self, method='random'):
         """
         Suggest a new pair of items with minimum entropy
 
@@ -270,15 +269,20 @@ class BayesPreference:
                                 [tuple(sorted(p)) for p in self.indifferent_preferences]
         new_combinations = list(set(possible_combinations) - set(existing_combinations))
 
-        entropy = []
-        for i, x in enumerate(new_combinations):
-            print('Computing entropy for {} of {} combinations'.format(i, len(new_combinations)))
-            entropy.append(self.compute_entropy(x))
+        if method == 'random':
+            index = np.random.choice(range(len(new_combinations)))
+            suggestion = new_combinations[int(index)]
+        elif method == 'min_entropy':
+            entropy = []
+            for i, x in enumerate(new_combinations):
+                print('Computing entropy for {} of {} combinations'.format(i, len(new_combinations)))
+                entropy.append(self.compute_entropy(x))
 
-        index = np.argmin(entropy)
-        return new_combinations[int(index)]
+            index = np.argmin(entropy)
+            suggestion = new_combinations[int(index)]
+        return suggestion
 
-    def suggest(self):
+    def suggest(self, method='random'):
         """
         Suggest a new item to compare with the most preferred item
 
@@ -296,12 +300,27 @@ class BayesPreference:
                 '''
                 All pairs that include the highest ranked item have been suggested, suggesting a fresh new pair instead.
                 ''')
-            return self.suggest_new_pair()
+            return self.suggest_new_pair(method=method)
 
-        entropy = []
-        for i, x in enumerate(new_combinations):
-            print('Computing entropy for {} of {} combinations'.format(i, len(new_combinations)))
-            entropy.append(self.compute_entropy(x))
-        index = np.argmin(entropy)
+        if method == 'random':
+            index = np.random.choice(range(len(new_combinations)))
+            suggestion = new_combinations[int(index)]
+        elif method == 'max_uncertainty':
+            self.infer_weights(method='mean')
+            utility_std = []
+            for items in new_combinations:
+                item = [i for i in items if i != best][0]
+                item_values = self.data.loc[item, :].values
+                utility_std.append(np.std([sample.dot(item_values) for sample in self.samples]))
+            index = np.argmax(utility_std)
+            suggestion = new_combinations[int(index)]
 
-        return new_combinations[int(index)]
+        elif method == 'min_entropy':
+            entropy = []
+            for i, x in enumerate(new_combinations):
+                print('Computing entropy for {} of {} combinations'.format(i, len(new_combinations)))
+                entropy.append(self.compute_entropy(x))
+            index = np.argmin(entropy)
+            suggestion = new_combinations[int(index)]
+
+        return suggestion

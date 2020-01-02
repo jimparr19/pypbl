@@ -167,22 +167,39 @@ def test_inference_with_strict_and_indifferent_preferences_with_mean_method(basi
     basic_model.infer_weights(method='mean')
     assert basic_model.weights[0] > basic_model.weights[1]
 
-
-def test_suggest_new_pair(basic_model):
+def test_suggest_new_pair_random_method(basic_model):
     basic_model.set_priors([Normal(), Normal()])
     basic_model.add_strict_preference('item 0', 'item 2')
     basic_model.add_strict_preference('item 1', 'item 2')
     basic_model.infer_weights()
-    new_pair = basic_model.suggest_new_pair()
+    new_pair = basic_model.suggest_new_pair(method='random')
     for item in new_pair:
         assert item in ['item 0', 'item 1']
 
 
-def test_suggest(basic_model):
+def test_suggest_random_method(basic_model):
     basic_model.set_priors([Normal(), Normal()])
     basic_model.add_strict_preference('item 0', 'item 1')
     basic_model.infer_weights()
-    pair = basic_model.suggest()
+    pair = basic_model.suggest(method='random')
+    assert 'item 0' in pair
+
+
+def test_suggest_new_pair_entropy_method(basic_model):
+    basic_model.set_priors([Normal(), Normal()])
+    basic_model.add_strict_preference('item 0', 'item 2')
+    basic_model.add_strict_preference('item 1', 'item 2')
+    basic_model.infer_weights()
+    new_pair = basic_model.suggest_new_pair(method='min_entropy')
+    for item in new_pair:
+        assert item in ['item 0', 'item 1']
+
+
+def test_suggest_entropy_method(basic_model):
+    basic_model.set_priors([Normal(), Normal()])
+    basic_model.add_strict_preference('item 0', 'item 1')
+    basic_model.infer_weights()
+    pair = basic_model.suggest(method='min_entropy')
     assert 'item 0' in pair
 
 
