@@ -2,6 +2,7 @@
 
 [![Actions Status](https://github.com/jimparr19/pypbl/workflows/pythonpackage/badge.svg)](https://github.com/jimparr19/pypbl/actions)
 [![Documentation Status](https://readthedocs.org/projects/pypbl/badge/?version=latest)](https://pypbl.readthedocs.io/en/latest/?badge=latest)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/jimparr19/pypbl/master?filepath=binder%2Fpypbl.ipynb)
 
 A python library for preference based learning using pairwise comparisons.
 
