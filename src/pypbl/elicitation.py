@@ -157,7 +157,7 @@ class BayesPreference:
     def infer_weights(self, method='MAP', iterations=100):
         """
         Infer weights for each attribute based on preferences.
-        method='MAP' uses gradient based optimisation to compute the maximum a posteriori
+        method='MAP' uses gradient based optimisation to compute the maximum a posteriori,
         method='mean' uses sampling to compute a better estimate of the weights when using non-normal priors
 
         Args:
@@ -264,7 +264,7 @@ class BayesPreference:
     def suggest_new_pair(self, method='random'):
         """
         Suggest a new pair of items with minimum entropy
-        method='random' chooses a new pair at random
+        method='random' chooses a new pair at random,
         method='min_entropy' chooses a new pair that minimises expected entropy
 
         Args:
@@ -302,8 +302,8 @@ class BayesPreference:
     def suggest(self, method='random'):
         """
         Suggest a new item to compare with the most preferred item
-        method='random' chooses a new pair that includes the top ranked item at random
-        method='max_variance' chooses a pair that includes the top ranked item and the item with greatest uncertainty
+        method='random' chooses a new pair that includes the top ranked item at random,
+        method='max_variance' chooses a pair that includes the top ranked item and the item with greatest uncertainty,
         method='min_entropy' chooses a pair that includes the top ranked item and minimises expected entropy
 
         Args:

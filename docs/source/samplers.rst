@@ -2,7 +2,7 @@
 Samlers
 =======
 
-pypbl.samlpers
+pypbl.samplers
 ==============
 
 Samplers for Bayesian inference.
