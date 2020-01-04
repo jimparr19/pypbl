@@ -1,6 +1,6 @@
-=======
-Samlers
-=======
+========
+Samplers
+========
 
 pypbl.samplers
 ==============
