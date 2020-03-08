@@ -55,7 +55,7 @@ def ensemble_sampler(fun, start, sigma, iterations, verbose=False):
         fun (function): log probability function used to infer weights.
         start (list): initial weights (it is recommended to use the MAP estimate).
         sigma (float): term used to encourage different starting conditions for walkers.
-        iterations (int): number of iterations in sampling algorithm (total number of evaluation will be  2 * number of weights * iterations).
+        iterations (int): number of iterations in sampling algorithm (total number of evaluation will be  2 * number of weights * iterations). # noqa
         verbose (boolean): set as True to get verbose print out.
 
     Returns:
