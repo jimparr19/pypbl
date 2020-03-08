@@ -9,7 +9,7 @@ from scipy.optimize import minimize
 from scipy.stats import norm
 from scipy.stats import gaussian_kde
 
-from pypbl.priors import Normal, Exponential
+from pypbl.priors import Exponential
 from pypbl.samplers import ensemble_sampler
 
 
