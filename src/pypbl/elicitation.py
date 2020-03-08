@@ -24,7 +24,8 @@ class BayesPreference:
         Args:
             data (object): Pandas DataFrame with columns as features and index as item names
         """
-        self.data = data
+        self.original_data = data.copy()
+        self.data = (data - data.min()) / (data.max() - data.min())
         self.items = self.data.index.values
         self.sigma = 0.1
         self.Sigma = self.sigma * np.eye(len(self.data.columns))
