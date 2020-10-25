@@ -1,3 +1,2 @@
 pypbl
 rise
-plotly

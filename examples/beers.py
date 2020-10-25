@@ -24,7 +24,7 @@ p.set_priors([
     Normal(),  # target_og - target gravity
 ])
 
-# add some preferences and infer the weights for each parameters
+# add some preferences and infer the weights for each parameter
 p.add_strict_preference('Indie Pale Ale', 'Kingpin')
 p.add_strict_preference('Dead Pony Club', 'Indie Pale Ale')
 p.add_strict_preference('Dead Pony Club', 'Punk IPA 2010 - Current')

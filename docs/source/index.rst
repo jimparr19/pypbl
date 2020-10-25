@@ -19,7 +19,7 @@ There are three approaches we could take:
 1. Ask the individual to manually rank all items.
 2. Ask the individual to provide weights based on their preferences of different features (size, cost, weight etc), and calculate the weighted value of each item.
 3. Find similar people and base recommendations on what these people also like.
-4. Ask the individual compare a small number of alternatives, and derive feature weights from those comparisons.
+4. Ask the individual to compare a small number of alternatives, and derive feature weights from those comparisons.
 
 Option 1 quickly becomes an enormous burden on the user as the number of items increases.
 

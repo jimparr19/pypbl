@@ -24,7 +24,7 @@ p.set_priors([
     Normal()  # number of carburetors
 ])
 
-# add some preferences and infer the weights for each parameters
+# add some preferences and infer the weights for each parameter
 p.add_strict_preference('Pontiac Firebird', 'Fiat 128')
 p.add_strict_preference('Mazda RX4', 'Mazda RX4 Wag')
 p.add_indifferent_preference('Merc 280', 'Merc 280C')
