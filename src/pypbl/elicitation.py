@@ -19,13 +19,17 @@ class BayesPreference:
 
     """
 
-    def __init__(self, data):
+    def __init__(self, data, normalise=True):
         """
         Args:
             data (object): Pandas DataFrame with columns as features and index as item names
+            normalise (bool): Normalise data using unit normalisation
         """
         self.original_data = data.copy()
-        self.data = (data - data.min()) / (data.max() - data.min())
+        if normalise:
+            self.data = (data - data.min()) / (data.max() - data.min())
+        else
+            self.data = data
         self.items = self.data.index.values
         self.sigma = 0.1
         self.Sigma = self.sigma * np.eye(len(self.data.columns))
@@ -110,8 +114,9 @@ class BayesPreference:
         """
         delta = self.data.loc[preference[0], :].values - self.data.loc[preference[1], :].values
         variance = delta.dot(self.Sigma).dot(delta)
+        sd = np.sqrt(variance)
         mean = weights.dot(delta)
-        return norm.logcdf(mean, loc=0, scale=np.sqrt(variance))
+        return norm.logcdf(mean, loc=0, scale=sd)
 
     def indifferent_log_probability(self, preference, weights):
         """
