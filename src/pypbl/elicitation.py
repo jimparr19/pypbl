@@ -26,10 +26,7 @@ class BayesPreference:
             normalise (bool): Normalise data using unit normalisation
         """
         self.original_data = data.copy()
-        if normalise:
-            self.data = (data - data.min()) / (data.max() - data.min())
-        else
-            self.data = data
+        self.data = (data - data.min()) / (data.max() - data.min()) if normalise else data
         self.items = self.data.index.values
         self.sigma = 0.1
         self.Sigma = self.sigma * np.eye(len(self.data.columns))
